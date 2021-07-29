@@ -6,16 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hiltonoliveir4/chat-node-grpc.git"
-  },
   "author": "Hilton Oliveira, Pablo Abreu",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/hiltonoliveir4/chat-node-grpc/issues"
-  },
-  "homepage": "https://github.com/hiltonoliveir4/chat-node-grpc#readme",
   "dependencies": {
     "@grpc/grpc-js": "^1.3.6",
     "@grpc/proto-loader": "^0.6.4"
