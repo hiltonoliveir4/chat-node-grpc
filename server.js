@@ -13,12 +13,17 @@ const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   oneofs: true,
 });
 
-bd = {
+const bd = {
   usuario: [
     {
       username: "Hilton",
       senha: "1234",
       admin: true,
+    },
+    {
+      username: "Pablo",
+      senha: "1234",
+      admin: false,
     },
   ],
   online: [],
@@ -32,6 +37,41 @@ const messageChat = protoDescriptor.MessageChat;
 const server = new grpc.Server();
 
 server.addService(messageChat.service, {
+  Ban: function (call, callback) {
+    const dados = call.request;
+
+    const user = dados.user;
+    const adminUser = dados.adminUser;
+    const roomName = dados.roomName;
+
+    const searchedUser = interpreter.searchLoggedUser(user);
+    const searchedAdminUser = interpreter.searchLoggedUser(adminUser);
+    const searchedRoom = interpreter.searchRoom(roomName);
+
+    if (
+      searchedUser !== false &&
+      searchedAdminUser !== false &&
+      searchedRoom !== false
+    ) {
+      if (searchedAdminUser[0].user.admin) {
+        const response = interpreter.ban(searchedUser[0], searchedRoom[1]);
+        callback(null, response);
+      } else {
+        const response = {
+          status: 404,
+          msg: `Você precisa de permissão de administrador para realizar esse comando`,
+        };
+        callback(null, response);
+      }
+    } else {
+      const response = {
+        status: 404,
+        msg: `Não foi possível concluir a solicitação`,
+      };
+      callback(null, response);
+    }
+  },
+
   CreateAccount: function (call, callback) {
     const dados = call.request;
 
@@ -83,25 +123,84 @@ server.addService(messageChat.service, {
     }
   },
 
+  Help: function (call, callback) {
+    const response = {
+      msg: `
+    /ban *usuario* *sala*
+    /createaccount *usuario* *senha*
+    /createroom *nome da sala*
+    /joinroom *nome da sala*
+    /kick *usuario* *sala*
+    /login *usuario* *senha*
+    /promotetoadmin *codigo de administrador*
+    /showroom`,
+      status: 200,
+    };
+    callback(null, response);
+  },
+
   Joinroom: function (call, callback) {
     const dados = call.request;
 
     const user = dados.user;
     const roomName = dados.roomName;
+
     const searchedUser = interpreter.searchLoggedUser(user);
     const searchedRoom = interpreter.searchRoom(roomName);
 
     if (searchedUser !== false && searchedRoom !== false) {
-      interpreter.joinroom(searchedUser[0].user, searchedRoom[1]);
-      const response = {
-        status: 200,
-        msg: `Você entrou na sala ${searchedRoom[0].roomName}`,
-      };
-      callback(null, response);
+      if (searchedRoom[0].blacklist.includes(searchedUser[0].user.username)) {
+        const response = {
+          status: 404,
+          msg: `Você está banido dessa sala`,
+        };
+        callback(null, response);
+      } else {
+        interpreter.joinroom(searchedUser[0].user, searchedRoom[1]);
+        const response = {
+          status: 200,
+          msg: `Você entrou na sala ${searchedRoom[0].roomName}`,
+        };
+        callback(null, response);
+      }
     } else {
       const response = {
         status: 404,
         msg: `Não foi possível entrar na sala`,
+      };
+      callback(null, response);
+    }
+  },
+
+  Kick: function (call, callback) {
+    const dados = call.request;
+    const user = dados.user;
+    const adminUser = dados.adminUser;
+    const roomName = dados.roomName;
+
+    const searchedUser = interpreter.searchLoggedUser(user);
+    const searchedAdminUser = interpreter.searchLoggedUser(adminUser);
+    const searchedRoom = interpreter.searchRoom(roomName);
+
+    if (
+      searchedUser !== false &&
+      searchedAdminUser !== false &&
+      searchedRoom !== false
+    ) {
+      if (searchedAdminUser[0].user.admin) {
+        const response = interpreter.kick(searchedUser[0], searchedRoom[1]);
+        callback(null, response);
+      } else {
+        const response = {
+          status: 404,
+          msg: `Você precisa de permissão de administrador para realizar esse comando`,
+        };
+        callback(null, response);
+      }
+    } else {
+      const response = {
+        status: 404,
+        msg: `Não foi possível concluir a solicitação`,
       };
       callback(null, response);
     }
@@ -162,6 +261,45 @@ server.addService(messageChat.service, {
 
       callback(null, response);
     }
+  },
+
+  SendMessage: function (call, callback) {
+    const dados = call.request;
+
+    const message = dados.message;
+    const user = dados.user;
+
+
+    const searchedLoggedUser = interpreter.searchLoggedUser(user);
+
+    if (searchedLoggedUser !== false) {
+      if (searchedLoggedUser[0].room !== undefined) {
+        interpreter.sendMessage(
+          searchedLoggedUser[0].user.username,
+          message,
+          searchedLoggedUser[0].room
+        );
+      } else {
+        const response = {
+          status: 404,
+          msg: `Você precisa estar em uma sala para enviar mensagens`,
+        };
+        callback(null, response);
+      }
+    } else {
+      const response = {
+        status: 404,
+        msg: `Você precisa estar logado para enviar mensagens`,
+      };
+      callback(null, response);
+    }
+
+    console.log(bd.sala[searchedLoggedUser[0].room].messages);
+  },
+
+  ShowRoom: function (call, callback) {
+    const response = interpreter.showRoom();
+    callback(null, response);
   },
 });
 

@@ -4,8 +4,14 @@ package chat;
 
 message Request{
     string user = 1;
-    optional string senha = 2;
-    optional string roomName = 3;
+    optional string adminUser = 2;
+    optional string senha = 3;
+    optional string roomName = 4;
+}
+
+message Mensagem{
+    string message = 1;
+    string user = 2;
 }
 
 message Response{
@@ -16,9 +22,14 @@ message Response{
 message Vazio { }
 
 service MessageChat{
+    rpc CreateAccount (Request) returns (Response);
+    rpc CreateRoom (Request) returns (Response);  
+    rpc Help (Vazio) returns (Response);  
+    rpc Joinroom (Request) returns (Response);
+    rpc Kick (Request) returns (Response);
     rpc Login (Request) returns (Response);
     rpc PromoteToAdmin (Request) returns (Response);
-    rpc CreateAccount (Request) returns (Response);
-    rpc CreateRoom (Request) returns (Response);    
-    rpc Joinroom (Request) returns (Response);
+    rpc ShowRoom (Vazio) returns (Response);
+    rpc Ban (Request) returns (Response);
+    rpc SendMessage (Mensagem) returns (Response);
 }

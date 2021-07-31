@@ -3,6 +3,22 @@ class Interpreter {
     this.bd = bd;
   }
 
+  ban (user, roomIndex){
+    if (this.bd.sala[roomIndex].blacklist.includes(user.user.username)){
+      return {
+        status: 200,
+        msg: `Usuário ${user.user.username} já está banido da sala`
+      }
+    } else {
+      this.bd.sala[roomIndex].blacklist.push(user.user.username);
+      const response = this.kick(user, roomIndex);
+      return {
+        status: 200,
+        msg: `Usuário ${user.user.username} banido da sala com sucesso`
+      }
+    }
+  }
+
   createAccount(user, senha) {
     this.bd.usuario.push({
       username: user,
@@ -15,6 +31,7 @@ class Interpreter {
     this.bd.sala.push({
       roomName: roomName,
       users: [],
+      blacklist: [],
       currentRoomMessage: 0,
       messages: [],
     });
@@ -34,6 +51,23 @@ class Interpreter {
         }
       }
     });
+  }
+
+  kick(user, roomIndex) {
+    const indice = this.bd.sala[roomIndex].users.indexOf(user.user);
+    if (indice != -1) {
+      this.bd.sala[roomIndex].users.splice(indice, 1);
+      user.room = undefined;
+      return {
+        status: 200,
+        msg: `Usuário ${user.user.username} removido com sucesso da sala`,
+      };
+    } else {
+      return {
+        status: 404,
+        msg: `Usuário ${user.user.username} não encontrado nessa sala`,
+      };
+    }
   }
 
   login(user) {
@@ -76,6 +110,26 @@ class Interpreter {
       }
     });
     return response;
+  }
+
+  sendMessage(username, msg, roomIndex){
+    this.bd.sala[roomIndex].messages.push({user: username, message: msg});
+    this.bd.sala[roomIndex].currentRoomMessage += 1;
+  }
+
+  showRoom(){
+    var response = `SALAS\n`;
+    this.bd.sala.map((item) => {
+      response += `${item.roomName}\n`;
+      item.users.map((user) => {
+        response += `${user.username}\n`;
+      });
+      response += `\n`
+    });
+    return{
+      status: 200,
+      msg: response
+    }
   }
 }
 
