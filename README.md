@@ -10,10 +10,10 @@ Projeto desenvolvido para a cadeira de Sistemas Distribuidos com o intuito de mo
 
 ## Iniciando a aplicação
 Iniciando o servidor:
-*node server.js
-
+* node server.js
+* 
 Iniciando o cliente:
-*node client.js
+* node client.js
 
 **ATENÇÃO: Para criar salas é necessário entrar como administrador** <br>
 **Se promover para admin: /promotetoadmin 147852369 ou o usuário admin já cadastrado usuario: Hilton, senha: 1234**
