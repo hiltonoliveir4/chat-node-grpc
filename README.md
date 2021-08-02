@@ -29,5 +29,5 @@ Iniciando o cliente:
 * Remover usuário da sala: /kick nome_do_usuario nome_da_sala (ex: kick Hilton SistemasDistribuidos)
 * Banir usuário da sala: /ban nome_do_usuario nome_da_sala (ex: /ban Hilton SistemasDistribuidos)
 
-**ATENÇÃO para o recebimento de novas mensagens deve se enviar o texto vazio para atualização de mensgaens não recebidas**
+**ATENÇÃO para o recebimento de novas mensagens deve se enviar o texto vazio para atualização de mensgaens não recebidas**<br>
 Pela limitação do terminal, teve-se que optar pelo recebimento de mensagens via requisição do cliente manualmente.
