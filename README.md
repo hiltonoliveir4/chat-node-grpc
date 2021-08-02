@@ -11,7 +11,6 @@ Projeto desenvolvido para a cadeira de Sistemas Distribuidos com o intuito de mo
 ## Iniciando a aplicação
 Iniciando o servidor:
 * node server.js
-* 
 Iniciando o cliente:
 * node client.js
 
