@@ -3,19 +3,19 @@ class Interpreter {
     this.bd = bd;
   }
 
-  ban (user, roomIndex){
-    if (this.bd.sala[roomIndex].blacklist.includes(user.user.username)){
+  ban(user, roomIndex) {
+    if (this.bd.sala[roomIndex].blacklist.includes(user.user.username)) {
       return {
         status: 200,
-        msg: `Usuário ${user.user.username} já está banido da sala`
-      }
+        msg: `Usuário ${user.user.username} já está banido da sala`,
+      };
     } else {
       this.bd.sala[roomIndex].blacklist.push(user.user.username);
       const response = this.kick(user, roomIndex);
       return {
         status: 200,
-        msg: `Usuário ${user.user.username} banido da sala com sucesso`
-      }
+        msg: `Usuário ${user.user.username} banido da sala com sucesso`,
+      };
     }
   }
 
@@ -35,6 +35,15 @@ class Interpreter {
       currentRoomMessage: 0,
       messages: [],
     });
+  }
+
+  getMessages(user) {
+    const tam = this.bd.sala[user.room].messages.length;
+    const mensagens =
+      this.bd.sala[user.room].messages.slice(user.currentMessage, tam);
+    user.currentMessage = tam;
+
+    return mensagens;
   }
 
   joinroom(user, roomIndex) {
@@ -112,24 +121,24 @@ class Interpreter {
     return response;
   }
 
-  sendMessage(username, msg, roomIndex){
-    this.bd.sala[roomIndex].messages.push({user: username, message: msg});
+  sendMessage(username, msg, roomIndex) {
+    this.bd.sala[roomIndex].messages.push({ user: username, message: msg });
     this.bd.sala[roomIndex].currentRoomMessage += 1;
   }
 
-  showRoom(){
+  showRoom() {
     var response = `SALAS\n`;
     this.bd.sala.map((item) => {
       response += `${item.roomName}\n`;
       item.users.map((user) => {
         response += `${user.username}\n`;
       });
-      response += `\n`
+      response += `\n`;
     });
-    return{
+    return {
       status: 200,
-      msg: response
-    }
+      msg: response,
+    };
   }
 }
 

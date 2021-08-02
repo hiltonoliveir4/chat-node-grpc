@@ -19,6 +19,11 @@ message Response{
     string msg = 2;
 }
 
+message ListaDeMensagens{
+    repeated Mensagem mensagens = 1;
+}
+
+
 message Vazio { }
 
 service MessageChat{
@@ -32,4 +37,5 @@ service MessageChat{
     rpc ShowRoom (Vazio) returns (Response);
     rpc Ban (Request) returns (Response);
     rpc SendMessage (Mensagem) returns (Response);
+    rpc GetMessage (Request) returns (ListaDeMensagens);
 }

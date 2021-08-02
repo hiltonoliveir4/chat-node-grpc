@@ -123,6 +123,20 @@ server.addService(messageChat.service, {
     }
   },
 
+  GetMessage: function (call, callback) {
+    const dados = call.request;
+
+    const user = dados.user;
+    const searchedUser = interpreter.searchLoggedUser(user);
+
+    if (searchedUser !== false) {
+      if (searchedUser[0].room !== undefined) {
+        const messages = interpreter.getMessages(searchedUser[0]);
+        callback(null, { mensagens: messages });
+      }
+    }
+  },
+
   Help: function (call, callback) {
     const response = {
       msg: `
@@ -269,7 +283,6 @@ server.addService(messageChat.service, {
     const message = dados.message;
     const user = dados.user;
 
-
     const searchedLoggedUser = interpreter.searchLoggedUser(user);
 
     if (searchedLoggedUser !== false) {
@@ -293,8 +306,6 @@ server.addService(messageChat.service, {
       };
       callback(null, response);
     }
-
-    console.log(bd.sala[searchedLoggedUser[0].room].messages);
   },
 
   ShowRoom: function (call, callback) {

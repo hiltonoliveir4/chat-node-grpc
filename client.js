@@ -19,18 +19,6 @@ const client = new protoDescriptor.MessageChat(
   grpc.credentials.createInsecure()
 );
 
-var recursiveAsyncReadLine = function () {
-  rl.question("", function (command) {
-    if (command == "/sair") {
-      return;
-    } else {
-      socket.write(command);
-    }
-
-    recursiveAsyncReadLine();
-  });
-};
-
 var rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -38,7 +26,7 @@ var rl = readline.createInterface({
 
 var usuario = "";
 
-var recursiveAsyncReadLine = function () {
+var recursiveAsyncReadLine = async () => {
   rl.question("", (command) => {
     const mensagem = command.split(" ");
     if (mensagem[0] == "/help") {
@@ -187,57 +175,27 @@ var recursiveAsyncReadLine = function () {
         );
       }
     }
-    // Chama a função recursivamente
-    recursiveAsyncReadLine();
   });
 };
 
+const getMessages = async (usuario) => {
+  if (usuario !== "") {
+    client.GetMessage(
+      {
+        user: usuario,
+      },
+      (err, res) => {
+        const response = res.mensagens;
+        response.map((item) => {
+          console.log(`${item.user} > ${item.message}`);
+        });
+      }
+    );
+  }
+};
+
+setInterval(() => {
+  getMessages(usuario);
+  recursiveAsyncReadLine();
+}, 5000);
 recursiveAsyncReadLine();
-
-// // //ENTRAR EM SALA
-// client.Joinroom(
-//   {
-//     user: "Hilton",
-//     roomName: "Sistemas Distribuidos",
-//   },
-//   (err, res) => {
-//     const response = res;
-//     console.log(response.status);
-//     console.log(response.msg);
-//   }
-// );
-
-// KICKAR USUÁRIO
-// client.Kick(
-//   {
-//     user: "Pablo",
-//     adminUser: "Hilton",
-//     roomName: "Sistemas Distribuidos"
-//   },
-//   (err, res) => {
-//     const response = res;
-//     console.log(response.status);
-//     console.log(response.msg);
-//   }
-// )
-
-//BANIR USUÁRIO
-// client.Ban(
-//   {
-//     user: "Pablo",
-//     adminUser: "Hilton",
-//     roomName: "Sistemas Distribuidos"
-//   },
-//   (err, res) => {
-//     const response = res;
-//     console.log(response.status);
-//     console.log(response.msg);
-//   }
-// )
-
-// // // //EXIBIR SALAS
-// client.ShowRoom({}, (err, res) => {
-//   const response = res;
-//   console.log(response.status);
-//   console.log(response.msg);
-// });
